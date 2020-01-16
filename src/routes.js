@@ -14,6 +14,8 @@ import SessionController from './app/controllers/SessionController';
 import FileController from './app/controllers/FileController';
 // Serviços
 import ServiceController from './app/controllers/ServiceController';
+// Serviços agendado
+import ScheduleController from './app/controllers/ScheduleController';
 // Usuário e Serviços
 import UserServiceController from './app/controllers/UserServiceController';
 // Soluções
@@ -66,6 +68,9 @@ routes.post('/company', CompanyController.store);
 routes.get('/users', UserController.index);
 // Listagem de Serviço
 routes.get('/services', ServiceController.index);
+// Listagem de Serviço agendados
+routes.get('/schedules/', ScheduleController.index);
+routes.get('/schedules/:provider', ScheduleController.index);
 // Listagem de Usuário e Serviço
 routes.get('/user_services', UserServiceController.index);
 // Listagem de Soluções
@@ -73,7 +78,7 @@ routes.get('/solutions', SolutionController.index);
 // Listagem de Setores
 routes.get('/sectors', SectorController.index);
 // Listagem de Localidade
-routes.get('/locations', LocationController.index);
+routes.get('/locations/:sectorId', LocationController.index);
 // Listagem de Oficina
 routes.get('/workshops', WorkshopController.index);
 // Listagem de Empresa
@@ -81,20 +86,20 @@ routes.get('/companies', CompanyController.index);
 
 // PUT COM SESSÃO DEFINIDA
 // Atualização do Usuário
-routes.put('/user', UserController.update);
+routes.put('/user/:id', UserController.update);
 // Atualização de Serviço
-routes.put('/service', ServiceController.update);
+routes.put('/service/:id', ServiceController.update);
 // Atualização de Usuário e Serviço
-routes.put('/user_service', UserServiceController.update);
+routes.put('/user_service/:id', UserServiceController.update);
 // Atualização de Soluções
-routes.put('/solution', SolutionController.update);
+routes.put('/solution/:id', SolutionController.update);
 // Atualização de Setores
-routes.put('/sector', SectorController.update);
+routes.put('/sector/:id', SectorController.update);
 // Atualização de Localidade
-routes.put('/location', LocationController.update);
+routes.put('/location/:id', LocationController.update);
 // Atualização de Oficina
-routes.put('/workshop', WorkshopController.update);
+routes.put('/workshop/:id', WorkshopController.update);
 // Atualização de Empresa
-routes.put('/company', CompanyController.update);
+routes.put('/company/:id', CompanyController.update);
 
 module.exports = routes;

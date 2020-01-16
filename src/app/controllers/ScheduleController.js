@@ -5,6 +5,8 @@ import { Op } from 'sequelize';
 // Modelo
 // Serviço
 import Services from '../models/Services';
+// Usuário
+import Users from '../models/Users';
 // Localização
 import Locations from '../models/Locations';
 // Setor
@@ -14,11 +16,69 @@ import Workshops from '../models/Workshop';
 
 class ScheduleController {
     async index(req, res) {
+        // Se Usuário é provedor
+        const isUser = await Users.findOne({
+            where: {
+                id: req.userId,
+                provider: true,
+            },
+        });
+
+        // Erro caso não seja ou não exista
+        if (!isUser) {
+            return res
+                .status(401)
+                .json({ msg: 'Usuário não é provedor de serviço.' });
+        }
+        // Se provedor não for nulo
+        const { provider } = req.params;
         // data inicial do mês atual
         const dateInitial = startOfMonth(new Date());
         const Now = new Date();
 
-        // Listando Seriços
+        if (provider) {
+            // Listando Seriços
+            const Service = await Services.findAll({
+                attributes: [
+                    'id',
+                    'title',
+                    'status',
+                    'date',
+                    'description',
+                    'note',
+                ],
+                where: {
+                    provider_id: req.userId,
+                    date: { [Op.gte]: dateInitial, [Op.lte]: Now },
+                },
+                include: [
+                    {
+                        model: Locations,
+                        as: 'location',
+                        attributes: ['id', 'description'],
+                        include: {
+                            model: Sector,
+                            as: 'sector',
+                            attributes: ['id', 'description'],
+                            where: {
+                                company_id: req.comp,
+                            },
+                        },
+                    },
+                    {
+                        model: Workshops,
+                        as: 'workshop',
+                        attributes: ['id', 'description'],
+                        where: {
+                            company_id: req.comp,
+                        },
+                    },
+                ],
+            });
+
+            return res.json(Service);
+        }
+        // Listando Seriços com prestador nulo
         const Service = await Services.findAll({
             attributes: [
                 'id',
@@ -29,7 +89,7 @@ class ScheduleController {
                 'note',
             ],
             where: {
-                user_id: req.userId,
+                provider_id: null,
                 date: { [Op.gte]: dateInitial, [Op.lte]: Now },
             },
             include: [

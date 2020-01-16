@@ -1,4 +1,3 @@
-'use strict';
 // Migration da tabela de serviços
 module.exports = {
     up: (queryInterface, Sequelize) => {

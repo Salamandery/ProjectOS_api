@@ -9,6 +9,35 @@ import Company from '../models/Company';
 
 class LocationController {
     async index(req, res) {
+        const { sectorId } = req.params;
+
+        if (sectorId) {
+            // Somente ativos vinculados ao setor
+            const Location = await Locations.findAll({
+                where: {
+                    active: true,
+                },
+                include: [
+                    {
+                        model: Sector,
+                        as: 'sector',
+                        attributes: ['id', 'description'],
+                        where: {
+                            company_id: req.comp,
+                            id: sectorId,
+                        },
+                        include: {
+                            model: Company,
+                            as: 'company',
+                            attributes: ['id', 'description'],
+                        },
+                    },
+                ],
+            });
+
+            return res.json(Location);
+        }
+
         // Somente ativos
         const Location = await Locations.findAll({
             where: {
@@ -66,9 +95,18 @@ class LocationController {
                 .status(400)
                 .json({ msg: 'Erro de validação nos campos.' });
         }
+        // Localidade a ser atualizada
+        const { id } = req.params;
+
+        if (!id) {
+            // Localidade invalido
+            return res
+                .status(401)
+                .json({ msg: 'Localidade inválida ou não existe.' });
+        }
 
         // Localidade a ser atualizado
-        const Exists = await Locations.findByPk(req.body.id);
+        const Exists = await Locations.findByPk(id);
 
         if (!Exists) {
             // Localidade invalido

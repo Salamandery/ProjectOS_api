@@ -9,7 +9,7 @@ class WorkshopController {
         const Workshop = await Workshops.findAll({
             where: {
                 active: true,
-            }
+            },
         });
 
         return res.json(Workshop);
@@ -18,8 +18,7 @@ class WorkshopController {
     async store(req, res) {
         // Validação
         const schema = Yup.object().shape({
-            description: Yup.string()
-                .required(),
+            description: Yup.string().required(),
         });
         // Se campos não forem válidos gera erros
         if (!(await schema.isValid(req.body))) {
@@ -32,14 +31,14 @@ class WorkshopController {
         const company_id = req.comp;
         // Realizar cadastro
         const Workshop = await Workshops.create({
-            description, 
+            description,
             active,
             company_id,
         });
 
         return res
             .status(200)
-            .json({ msg: "Cadastro realizado com sucesso!", Workshop});
+            .json({ msg: 'Cadastro realizado com sucesso!', Workshop });
     }
 
     async update(req, res) {
@@ -60,14 +59,15 @@ class WorkshopController {
 
         if (!Exists) {
             // Oficina invalido
-            return res.status(401).json({ msg: 'Oficina inválida ou não existe.' });
+            return res
+                .status(401)
+                .json({ msg: 'Oficina inválida ou não existe.' });
         }
 
-        // Atualizando Oficina 
+        // Atualizando Oficina
         const Workshop = await Exists.update(req.body);
 
-        return res
-            .json({ msg: "Alteração realizada com sucesso!", Workshop});
+        return res.json({ msg: 'Alteração realizada com sucesso!', Workshop });
     }
 }
 

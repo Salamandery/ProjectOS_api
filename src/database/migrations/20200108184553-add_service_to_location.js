@@ -1,4 +1,3 @@
-'use strict';
 // Migration coluna de relacionamento localização e serviço
 module.exports = {
     up: (queryInterface, Sequelize) => {
@@ -7,7 +6,7 @@ module.exports = {
             references: { model: 'locations', key: 'id' },
             onUpdate: 'CASCADE',
             onDelete: 'SET NULL',
-            allowNull: false,
+            allowNull: true,
         });
     },
 

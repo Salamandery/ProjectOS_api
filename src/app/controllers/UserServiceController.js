@@ -1,4 +1,4 @@
-import * as Yup from 'yup';
+//import * as Yup from 'yup';
 import { startOfMonth } from 'date-fns';
 // Sequelize options
 import { Op } from 'sequelize';
@@ -29,7 +29,9 @@ class UserServiceController {
 
         // Erro caso não seja ou não exista
         if (!isUser) {
-            return res.status(401).json({ msg: 'Usuário não é provedor de serviço.' });
+            return res
+                .status(401)
+                .json({ msg: 'Usuário não é provedor de serviço.' });
         }
 
         // data inicial do mês atual
@@ -42,38 +44,52 @@ class UserServiceController {
                 [Op.or]: [
                     {
                         user_id: {
-                            [Op.eq]: req.userId
-                        }
+                            [Op.eq]: req.userId,
+                        },
                     },
                     {
                         user_id: {
-                            [Op.ne]: req.userId
-                        }
+                            [Op.ne]: req.userId,
+                        },
                     },
-                ],    
+                ],
             },
-            attributes: ['service_id', 'id', 'user_id', 'date_initial', 'date_final', 'note', 'min_to_resolve'],
+            attributes: [
+                'service_id',
+                'id',
+                'user_id',
+                'date_initial',
+                'date_final',
+                'note',
+                'min_to_resolve',
+            ],
             include: [
                 {
                     model: Services,
                     as: 'service',
-                    attributes: ['title', 'status', 'date', 'description', 'note'],
+                    attributes: [
+                        'title',
+                        'status',
+                        'date',
+                        'description',
+                        'note',
+                    ],
                     where: {
                         [Op.or]: [
                             {
                                 provider_id: {
-                                    [Op.eq]: req.userId
-                                }
+                                    [Op.eq]: req.userId,
+                                },
                             },
                             {
                                 provider_id: {
-                                    [Op.ne]: req.userId
-                                }
+                                    [Op.ne]: req.userId,
+                                },
                             },
                         ],
-                        date: { 
-                            [Op.gte]: dateInitial, 
-                            [Op.lte]: Now 
+                        date: {
+                            [Op.gte]: dateInitial,
+                            [Op.lte]: Now,
                         },
                     },
                     include: [
@@ -86,29 +102,29 @@ class UserServiceController {
                                 as: 'sector',
                                 attributes: ['id', 'description'],
                                 where: {
-                                    company_id: req.comp
-                                }
-                            }
+                                    company_id: req.comp,
+                                },
+                            },
                         },
                         {
                             model: User,
                             as: 'user',
-                            attributes: ['login', 'email', 'name']
+                            attributes: ['login', 'email', 'name'],
                         },
                         {
                             model: User,
                             as: 'provider',
-                            attributes: ['login', 'email', 'name']
+                            attributes: ['login', 'email', 'name'],
                         },
                         {
                             model: User,
                             as: 'last_user',
-                            attributes: ['login', 'email', 'name']
+                            attributes: ['login', 'email', 'name'],
                         },
                         {
                             model: Files,
                             as: 'file',
-                            attributes: ['name', 'path', 'url']
+                            attributes: ['name', 'path', 'url'],
                         },
                         {
                             model: Workshops,
@@ -116,12 +132,12 @@ class UserServiceController {
                             attributes: ['id', 'description'],
                             where: {
                                 id: {
-                                    [Op.in]: req.ws
+                                    [Op.in]: req.ws,
                                 },
                                 company_id: req.comp,
                             },
-                        }
-                    ]
+                        },
+                    ],
                 },
             ],
         });
@@ -140,8 +156,12 @@ class UserServiceController {
 
         // Erro caso não seja ou não exista
         if (!isUser) {
-            return res.status(401).json({ msg: 'Usuário não é provedor de serviço.' });
+            return res
+                .status(401)
+                .json({ msg: 'Usuário não é provedor de serviço.' });
         }
+
+        return res.json();
     }
 
     async update(req, res) {
@@ -155,8 +175,12 @@ class UserServiceController {
 
         // Erro caso não seja ou não exista
         if (!isUser) {
-            return res.status(401).json({ msg: 'Usuário não é provedor de serviço.' });
+            return res
+                .status(401)
+                .json({ msg: 'Usuário não é provedor de serviço.' });
         }
+
+        return res.json();
     }
 
     async delete(req, res) {
@@ -170,8 +194,12 @@ class UserServiceController {
 
         // Erro caso não seja ou não exista
         if (!isUser) {
-            return res.status(401).json({ msg: 'Usuário não é provedor de serviço.' });
+            return res
+                .status(401)
+                .json({ msg: 'Usuário não é provedor de serviço.' });
         }
+
+        return res.json();
     }
 }
 
