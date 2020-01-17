@@ -1,4 +1,4 @@
-import * as Yup from 'yup';
+import formatDate from '../utils/formatDate';
 import { startOfMonth } from 'date-fns';
 // Sequelize options
 import { Op } from 'sequelize';
@@ -38,9 +38,11 @@ class ScheduleController {
         const dateInitial = startOfMonth(new Date());
         const Now = new Date();
 
+        let Service = {};
+
         if (provider == 1) {
             // Listando Seriços do usuário
-            const Service = await Services.findAll({
+            Service = await Services.findAll({
                 attributes: [
                     'id',
                     'title',
@@ -52,11 +54,9 @@ class ScheduleController {
                 where: {
                     provider_id: req.userId,
                     date: { [Op.gte]: dateInitial, [Op.lte]: Now },
-                    workshop_id: { [Op.in]: isUser.workshops }
+                    workshop_id: { [Op.in]: isUser.workshops },
                 },
-                order: [
-                    ['date', 'desc'],
-                ],
+                order: [['date', 'desc']],
                 include: [
                     {
                         model: Locations,
@@ -72,8 +72,8 @@ class ScheduleController {
                             include: {
                                 model: Company,
                                 as: 'company',
-                                attributes: ['id', 'description']
-                            }
+                                attributes: ['id', 'description'],
+                            },
                         },
                     },
                     {
@@ -87,20 +87,18 @@ class ScheduleController {
                     {
                         model: Users,
                         as: 'user',
-                        attributes: ['name', 'login', 'email']
+                        attributes: ['name', 'login', 'email'],
                     },
                     {
                         model: Users,
                         as: 'provider',
-                        attributes: ['name', 'login', 'email']
-                    }
+                        attributes: ['name', 'login', 'email'],
+                    },
                 ],
             });
-
-            return res.json(Service);
         } else if (provider == 2) {
             // Listando Seriços do usuário
-            const Service = await Services.findAll({
+            Service = await Services.findAll({
                 attributes: [
                     'id',
                     'title',
@@ -111,11 +109,9 @@ class ScheduleController {
                 ],
                 where: {
                     date: { [Op.gte]: dateInitial, [Op.lte]: Now },
-                    workshop_id: { [Op.in]: isUser.workshops }
+                    workshop_id: { [Op.in]: isUser.workshops },
                 },
-                order: [
-                    ['date', 'desc'],
-                ],
+                order: [['date', 'desc']],
                 include: [
                     {
                         model: Locations,
@@ -141,70 +137,80 @@ class ScheduleController {
                     {
                         model: Users,
                         as: 'user',
-                        attributes: ['name', 'login', 'email']
+                        attributes: ['name', 'login', 'email'],
                     },
                     {
                         model: Users,
                         as: 'provider',
-                        attributes: ['name', 'login', 'email']
-                    }
+                        attributes: ['name', 'login', 'email'],
+                    },
                 ],
             });
-
-            return res.json(Service);
-        }
-        // Listando Seriços com prestador nulo
-        const Service = await Services.findAll({
-            attributes: [
-                'id',
-                'title',
-                'status',
-                'date',
-                'description',
-                'note',
-            ],
-            where: {
-                provider_id: null,
-                date: { [Op.gte]: dateInitial, [Op.lte]: Now },
-                workshop_id: { [Op.in]: isUser.workshops }
-            },
-            order: [
-                ['date', 'desc'],
-            ],
-            include: [
-                {
-                    model: Locations,
-                    as: 'location',
-                    attributes: ['id', 'description'],
-                    include: {
-                        model: Sector,
-                        as: 'sector',
+        } else {
+            // Listando Seriços com prestador nulo
+            Service = await Services.findAll({
+                attributes: [
+                    'id',
+                    'title',
+                    'status',
+                    'date',
+                    'description',
+                    'note',
+                ],
+                where: {
+                    provider_id: null,
+                    date: { [Op.gte]: dateInitial, [Op.lte]: Now },
+                    workshop_id: { [Op.in]: isUser.workshops },
+                },
+                order: [['date', 'desc']],
+                include: [
+                    {
+                        model: Locations,
+                        as: 'location',
+                        attributes: ['id', 'description'],
+                        include: {
+                            model: Sector,
+                            as: 'sector',
+                            attributes: ['id', 'description'],
+                            where: {
+                                company_id: req.comp,
+                            },
+                        },
+                    },
+                    {
+                        model: Workshops,
+                        as: 'workshop',
                         attributes: ['id', 'description'],
                         where: {
                             company_id: req.comp,
                         },
                     },
-                },
-                {
-                    model: Workshops,
-                    as: 'workshop',
-                    attributes: ['id', 'description'],
-                    where: {
-                        company_id: req.comp,
+                    {
+                        model: Users,
+                        as: 'user',
+                        attributes: ['name', 'login', 'email'],
                     },
-                },
-                {
-                    model: Users,
-                    as: 'user',
-                    attributes: ['name', 'login', 'email']
-                },
-                {
-                    model: Users,
-                    as: 'provider',
-                    attributes: ['name', 'login', 'email']
-                }
-            ],
-        });
+                    {
+                        model: Users,
+                        as: 'provider',
+                        attributes: ['name', 'login', 'email'],
+                    },
+                ],
+            });
+        }
+
+        // Data formatada
+        Service = Service.map(srv => ({
+            id: srv.id,
+            status: srv.status,
+            date: srv.date,
+            title: srv.title,
+            description: srv.description,
+            user: srv.user,
+            provider: srv.provider,
+            location: srv.location,
+            formattedDate: formatDate(srv.date),
+        }));
 
         return res.json(Service);
     }
