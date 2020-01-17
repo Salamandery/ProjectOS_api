@@ -89,6 +89,8 @@ routes.get('/companies', CompanyController.index);
 routes.put('/user/:id', UserController.update);
 // Atualização de Serviço
 routes.put('/service/:id', ServiceController.update);
+// Atualizaçao do agendamento
+routes.put('/schedule/:id', ScheduleController.update);
 // Atualização de Usuário e Serviço
 routes.put('/user_service/:id', UserServiceController.update);
 // Atualização de Soluções

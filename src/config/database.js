@@ -13,4 +13,10 @@ module.exports = {
         underscored: true,
         underscoredAll: true,
     },
+    dialectOptions: {
+        useUTC: false,
+        dateStrings: true,
+        typeCast: true,
+    },
+    timezone: process.env.TIMEZONE
 };

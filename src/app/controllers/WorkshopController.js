@@ -54,8 +54,10 @@ class WorkshopController {
                 .json({ msg: 'Erro de validação nos campos.' });
         }
 
+        const { id } = req.params;
+
         // Oficina a ser atualizado
-        const Exists = await Workshops.findByPk(req.body.id);
+        const Exists = await Workshops.findByPk(id);
 
         if (!Exists) {
             // Oficina invalido

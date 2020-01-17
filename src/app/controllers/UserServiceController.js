@@ -132,7 +132,7 @@ class UserServiceController {
                             attributes: ['id', 'description'],
                             where: {
                                 id: {
-                                    [Op.in]: req.ws,
+                                    [Op.in]: isUser.workshops,
                                 },
                                 company_id: req.comp,
                             },

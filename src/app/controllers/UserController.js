@@ -95,8 +95,10 @@ class UserController {
         // Valores passados pelo body
         const { email, oldPassword } = req.body;
 
+        const { id } = req.params;
+
         // Verifica se usuário existe
-        const Exists = await User.findByPk(req.userId);
+        const Exists = await User.findByPk(id);
         if (email !== Exists.email) {
             // Verificando se email existe
             const emailExists = await User.findOne({ where: { email } });

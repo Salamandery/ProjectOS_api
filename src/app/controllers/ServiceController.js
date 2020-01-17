@@ -13,6 +13,8 @@ import Locations from '../models/Locations';
 import Sector from '../models/Sector';
 // Oficinas
 import Workshops from '../models/Workshop';
+// Empresa
+import Company from '../models/Company';
 
 class ServiceController {
     async index(req, res) {
@@ -46,6 +48,11 @@ class ServiceController {
                         where: {
                             company_id: req.comp,
                         },
+                        include: {
+                            model: Company,
+                            as: 'company',
+                            attributes: ['id', 'description']
+                        }
                     },
                 },
                 {
@@ -77,6 +84,7 @@ class ServiceController {
             location_id: Yup.number(),
             workshop_id: Yup.number().required(),
         });
+        
         // Se campos não forem válidos gera erros
         if (!(await schema.isValid(req.body))) {
             return res
@@ -119,7 +127,6 @@ class ServiceController {
             description: Yup.string(),
             note: Yup.string(),
             location_id: Yup.number(),
-            company_id: Yup.number(),
             workshop_id: Yup.number(),
             provider_id: Yup.number(),
             user_id: Yup.number(),
@@ -139,7 +146,29 @@ class ServiceController {
             return res.json({ msg: 'Não existe registro a ser atualizado' });
         }
 
-        const service = await Exists.update(req.body);
+        // Criando informações no db
+        const {
+            date,
+            title,
+            description,
+            note,
+            location_id,
+            workshop_id,
+            user_id,
+            provider_id,
+        } = req.body;
+
+        const service = await Exists.update({
+            date,
+            title,
+            description,
+            note,
+            location_id,
+            workshop_id,
+            user_id,
+            user_id_lastupdate: req.userId,
+            provider_id,
+        });
 
         return res.json({ msg: 'Alteração realizada com sucesso', service });
     }
