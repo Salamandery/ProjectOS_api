@@ -16,18 +16,6 @@ class UserController {
     }
 
     async store(req, res) {
-        // Verifica se o usuário é válido e existe
-        /* const isUser = await User.findOne({
-            where: {
-                id: req.userId,
-            },
-        });
-
-        // Erro caso não seja ou não exista
-        if (!isUser) {
-            return res.status(401).json({ msg: 'Usuário inexistente.' });
-        } */
-
         // Validação
         const schema = Yup.object().shape({
             name: Yup.string().required(),
