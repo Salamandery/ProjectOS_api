@@ -231,7 +231,7 @@ class ScheduleController {
                 .json({ msg: 'Usuário não é provedor de serviço.' });
         }
         // Se provedor não for nulo
-        const { id } = req.params;
+        const { id, provider_id } = req.params;
 
         // Atualizando informações no db
         const Exists = await Services.findByPk(id);
@@ -240,6 +240,21 @@ class ScheduleController {
             return res.json({ msg: 'Não existe registro a ser atualizado' });
         }
 
+        if (provider_id) {
+
+            if (provider_id == 0) {
+                return res.json({ msg: 'Provedor inválido.' });
+            }
+            // Transferência de provedor de serviço
+            const service = await Exists.update({
+                provider_id,
+                user_id_lastupdate: req.userId,
+            });
+
+            return res.json({ msg: 'Alteração realizada com sucesso', service });
+        }
+
+        // Recebendo/Assumindo ordem de serviço
         const service = await Exists.update({
             provider_id: req.userId,
             user_id_lastupdate: req.userId,

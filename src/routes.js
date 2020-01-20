@@ -8,6 +8,8 @@ import auth from './app/middlewares/auth';
 // Controllers
 // User
 import UserController from './app/controllers/UserController';
+// Provedores
+import ProviderController from './app/controllers/ProviderController';
 // Session
 import SessionController from './app/controllers/SessionController';
 // File
@@ -66,10 +68,13 @@ routes.post('/company', CompanyController.store);
 // GET COM SESSÃO DEFINIDA
 // Listagem de Usuários
 routes.get('/users', UserController.index);
+// Listagem de Usuários provedores
+routes.get('/providers', ProviderController.index);
 // Listagem de Serviço
 routes.get('/services', ServiceController.index);
 // Listagem de Serviço agendados
 routes.get('/schedules/', ScheduleController.index);
+// Listagem de Serviço agendados por provedor
 routes.get('/schedules/:provider', ScheduleController.index);
 // Listagem de Usuário e Serviço
 routes.get('/user_services', UserServiceController.index);
@@ -91,6 +96,8 @@ routes.put('/user/:id', UserController.update);
 routes.put('/service/:id', ServiceController.update);
 // Atualizaçao do agendamento
 routes.put('/schedule/:id', ScheduleController.update);
+// Transferência do agendamento
+routes.put('/schedule/:id/:provider_id', ScheduleController.update);
 // Atualização de Usuário e Serviço
 routes.put('/user_service/:id', UserServiceController.update);
 // Atualização de Soluções
