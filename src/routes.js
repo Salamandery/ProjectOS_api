@@ -91,6 +91,8 @@ routes.get('/companies', CompanyController.index);
 
 // PUT COM SESSÃO DEFINIDA
 // Atualização do Usuário
+routes.put('/user/', UserController.update);
+// Atualização do Usuário
 routes.put('/user/:id', UserController.update);
 // Atualização de Serviço
 routes.put('/service/:id', ServiceController.update);

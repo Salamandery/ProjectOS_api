@@ -9,35 +9,36 @@ class SessionController {
     async store(req, res) {
         // Validação
         const schema = Yup.object().shape({
-            login: Yup.string()
-                .required(),
+            login: Yup.string().required(),
             password: Yup.string()
                 .required()
                 .min(6),
-            company: Yup.number()
-                .required(),
+            company: Yup.number().required(),
         });
         // Se campos não forem válidos gera erros
         if (!(await schema.isValid(req.body))) {
-            return res
-                .status(400)
-                .json({ msg: 'Erro de validação nos campos.' });
+            return res.json({
+                status: 400,
+                msg: 'Erro de validação nos campos.',
+            });
         }
 
         // Dados pelo body
         const { login, password, company } = req.body;
 
         // Verifica se usuário existe
-        const user = await User.findOne({ where: { login: login.toLowerCase() } });
+        const user = await User.findOne({
+            where: { login: login.toLowerCase() },
+        });
 
         if (!user) {
             // Senão existe retorna erro
-            return res.status(401).json({ msg: 'Usuário ou senha inválida!' });
+            return res.json({ status: 401, msg: 'Usuário ou senha inválida!' });
         }
 
         if (!(await user.checkPassword(password))) {
             // Se senha inválida retorna erro
-            return res.status(401).json({ msg: 'Senha inválida!' });
+            return res.json({ status: 401, msg: 'Senha inválida!' });
         }
 
         const { id, name, email, workshops, workshop_default } = user;
@@ -49,14 +50,18 @@ class SessionController {
                 email,
                 login,
             },
-            token: jwt.sign({ 
-                id, 
-                login, 
-                email, 
-                comp: company, 
-                wd: workshop_default, 
-                ws: workshops 
-            }, conf.secret, { expiresIn: conf.expiresIn }),
+            token: jwt.sign(
+                {
+                    id,
+                    login,
+                    email,
+                    comp: company,
+                    wd: workshop_default,
+                    ws: workshops,
+                },
+                conf.secret,
+                { expiresIn: conf.expiresIn }
+            ),
         });
     }
 }

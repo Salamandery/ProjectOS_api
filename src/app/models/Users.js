@@ -21,7 +21,7 @@ class User extends Model {
         );
         // Operação executada antes de criar um usuário
         this.addHook('beforeSave', async user => {
-            if (user) {
+            if (user.password) {
                 // Criptografando senha antes de criação do usuário
                 user.password_hash = await bcrypt.hash(user.password, 8);
             }

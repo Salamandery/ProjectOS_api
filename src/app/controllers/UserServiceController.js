@@ -29,9 +29,10 @@ class UserServiceController {
 
         // Erro caso não seja ou não exista
         if (!isUser) {
-            return res
-                .status(401)
-                .json({ msg: 'Usuário não é provedor de serviço.' });
+            return res.json({
+                status: 401,
+                msg: 'Usuário não é provedor de serviço.',
+            });
         }
 
         // data inicial do mês atual
@@ -156,9 +157,10 @@ class UserServiceController {
 
         // Erro caso não seja ou não exista
         if (!isUser) {
-            return res
-                .status(401)
-                .json({ msg: 'Usuário não é provedor de serviço.' });
+            return res.json({
+                status: 401,
+                msg: 'Usuário não é provedor de serviço.',
+            });
         }
 
         return res.json();
@@ -175,9 +177,10 @@ class UserServiceController {
 
         // Erro caso não seja ou não exista
         if (!isUser) {
-            return res
-                .status(401)
-                .json({ msg: 'Usuário não é provedor de serviço.' });
+            return res.json({
+                status: 401,
+                msg: 'Usuário não é provedor de serviço.',
+            });
         }
 
         return res.json();
@@ -194,9 +197,10 @@ class UserServiceController {
 
         // Erro caso não seja ou não exista
         if (!isUser) {
-            return res
-                .status(401)
-                .json({ msg: 'Usuário não é provedor de serviço.' });
+            return res.json({
+                status: 401,
+                msg: 'Usuário não é provedor de serviço.',
+            });
         }
 
         return res.json();

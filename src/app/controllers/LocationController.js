@@ -71,15 +71,16 @@ class LocationController {
         });
         // Se campos não forem válidos gera erros
         if (!(await schema.isValid(req.body))) {
-            return res
-                .status(400)
-                .json({ msg: 'Erro de validação nos campos.' });
+            return res.json({
+                status: 400,
+                msg: 'Erro de validação nos campos.',
+            });
         }
 
         // Realizar cadastro
         const Location = await Locations.create(req.body);
 
-        return res.json({ msg: 'Cadastro realizado com sucesso!', Location });
+        return res.json(Location);
     }
 
     async update(req, res) {
@@ -91,18 +92,20 @@ class LocationController {
         });
         // Se campos não forem válidos gera erros
         if (!(await schema.isValid(req.body))) {
-            return res
-                .status(400)
-                .json({ msg: 'Erro de validação nos campos.' });
+            return res.json({
+                status: 400,
+                msg: 'Erro de validação nos campos.',
+            });
         }
         // Localidade a ser atualizada
         const { id } = req.params;
 
         if (!id) {
             // Localidade invalido
-            return res
-                .status(401)
-                .json({ msg: 'Localidade inválida ou não existe.' });
+            return res.json({
+                status: 401,
+                msg: 'Localidade inválida ou não existe.',
+            });
         }
 
         // Localidade a ser atualizado
@@ -110,15 +113,16 @@ class LocationController {
 
         if (!Exists) {
             // Localidade invalido
-            return res
-                .status(401)
-                .json({ msg: 'Localidade inválida ou não existe.' });
+            return res.json({
+                status: 401,
+                msg: 'Localidade inválida ou não existe.',
+            });
         }
 
         // Atualizando Localidade
         const Location = await Exists.update(req.body);
 
-        return res.json({ msg: 'Alteração realizada com sucesso!', Location });
+        return res.json(Location);
     }
 }
 

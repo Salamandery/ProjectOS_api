@@ -42,7 +42,7 @@ module.exports = {
                 defaultValue: false,
             },
             workshop_default: {
-                type: Sequelize.STRING,
+                type: Sequelize.INTEGER,
                 allowNull: true,
             },
             workshops: {

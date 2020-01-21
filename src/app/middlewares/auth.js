@@ -27,9 +27,9 @@ export default async (req, res, next) => {
             return next();
         } catch (err) {
             // Se token inválido bloqueia a navegação
-            return res.status(401).json({ msg: 'Token inválido' });
+            return res.json({ status: 401, msg: 'Token inválido' });
         }
     }
     // Se não há token bloqueia a navegação
-    return res.status(401).json({ msg: 'É necessário fazer login' });
+    return res.json({ status: 401, msg: 'É necessário fazer login' });
 };

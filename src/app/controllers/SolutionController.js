@@ -9,7 +9,7 @@ class SolutionController {
         const Solution = await Solutions.findAll({
             where: {
                 active: true,
-            }
+            },
         });
 
         return res.json(Solution);
@@ -18,27 +18,26 @@ class SolutionController {
     async store(req, res) {
         // Validação
         const schema = Yup.object().shape({
-            description: Yup.string()
-                .required(),
+            description: Yup.string().required(),
         });
         // Se campos não forem válidos gera erros
         if (!(await schema.isValid(req.body))) {
-            return res
-                .status(400)
-                .json({ msg: 'Erro de validação nos campos.' });
+            return res.json({
+                status: 400,
+                msg: 'Erro de validação nos campos.',
+            });
         }
         const { description, active } = req.body;
         // Codigo da empresa logada
         const company_id = req.comp;
         // Realizar cadastro
         const Solution = await Solutions.create({
-            description, 
+            description,
             active,
             company_id,
         });
 
-        return res
-            .json({ msg: "Cadastro realizado com sucesso!", Solution});
+        return res.json(Solution);
     }
 
     async update(req, res) {
@@ -49,9 +48,10 @@ class SolutionController {
         });
         // Se campos não forem válidos gera erros
         if (!(await schema.isValid(req.body))) {
-            return res
-                .status(400)
-                .json({ msg: 'Erro de validação nos campos.' });
+            return res.json({
+                status: 400,
+                msg: 'Erro de validação nos campos.',
+            });
         }
 
         // Oficina a ser atualizado
@@ -59,14 +59,16 @@ class SolutionController {
 
         if (!Exists) {
             // Oficina invalido
-            return res.status(401).json({ msg: 'Oficina inválida ou não existe.' });
+            return res.json({
+                status: 401,
+                msg: 'Oficina inválida ou não existe.',
+            });
         }
 
-        // Atualizando Oficina 
+        // Atualizando Oficina
         const Solution = await Exists.update(req.body);
 
-        return res
-            .json({ msg: "Alteração realizada com sucesso!", Solution});
+        return res.json(Solution);
     }
 }
 

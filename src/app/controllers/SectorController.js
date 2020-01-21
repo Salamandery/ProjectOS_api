@@ -17,9 +17,14 @@ class SectorController {
                 {
                     model: Company,
                     as: 'company',
-                    attributes: ['id', 'description', 'identification', 'active']
-                }
-            ]
+                    attributes: [
+                        'id',
+                        'description',
+                        'identification',
+                        'active',
+                    ],
+                },
+            ],
         });
 
         return res.json(Sector);
@@ -28,22 +33,21 @@ class SectorController {
     async store(req, res) {
         // Validação
         const schema = Yup.object().shape({
-            description: Yup.string()
-                .required(),
+            description: Yup.string().required(),
             company_id: Yup.number(),
         });
         // Se campos não forem válidos gera erros
         if (!(await schema.isValid(req.body))) {
-            return res
-                .status(400)
-                .json({ msg: 'Erro de validação nos campos.' });
+            return res.json({
+                status: 400,
+                msg: 'Erro de validação nos campos.',
+            });
         }
 
         // Realizar cadastro
         const Sector = await Sectors.create(req.body);
 
-        return res
-            .json({ msg: "Cadastro realizado com sucesso!", Sector});
+        return res.json(Sector);
     }
 
     async update(req, res) {
@@ -55,9 +59,10 @@ class SectorController {
         });
         // Se campos não forem válidos gera erros
         if (!(await schema.isValid(req.body))) {
-            return res
-                .status(400)
-                .json({ msg: 'Erro de validação nos campos.' });
+            return res.json({
+                status: 400,
+                msg: 'Erro de validação nos campos.',
+            });
         }
 
         // Setor a ser atualizado
@@ -65,14 +70,16 @@ class SectorController {
 
         if (!Exists) {
             // Setor invalido
-            return res.status(401).json({ msg: 'Setor inválida ou não existe.' });
+            return res.json({
+                status: 401,
+                msg: 'Setor inválida ou não existe.',
+            });
         }
 
-        // Atualizando Setor 
+        // Atualizando Setor
         const Sector = await Exists.update(req.body);
 
-        return res
-            .json({ msg: "Alteração realizada com sucesso!", Sector});
+        return res.json(Sector);
     }
 }
 

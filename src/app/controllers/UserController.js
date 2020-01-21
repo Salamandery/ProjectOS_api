@@ -3,13 +3,31 @@ import * as Yup from 'yup';
 import User from '../models/Users';
 
 class UserController {
-    async index(req, res) {
-        // Listando usuários
+    async show(req, res) {
+        // Listando informação usuário
         const users = await User.findOne({
             where: {
                 id: req.userId,
             },
-            attributes: ['id', 'name', 'email', 'created_at'],
+        });
+
+        return res.json(users);
+    }
+    async index(req, res) {
+        // Listando usuários
+        const users = await User.findAll({
+            attributes: [
+                'id',
+                'active',
+                'name',
+                'email',
+                'login',
+                'workshop_default',
+                'workshops',
+                'provider',
+                'created_at',
+                'updated_at',
+            ],
         });
 
         return res.json(users);
@@ -29,9 +47,10 @@ class UserController {
         });
         // Se campos não forem válidos gera erros
         if (!(await schema.isValid(req.body))) {
-            return res
-                .status(400)
-                .json({ msg: 'Erro de validação nos campos.' });
+            return res.json({
+                status: 400,
+                msg: 'Erro de validação nos campos.',
+            });
         }
 
         // Verifica se usuário já existe
@@ -40,30 +59,28 @@ class UserController {
         if (Exists) {
             // Se usuário existe retorna erro
             Exists.password_hash = undefined;
-            return res
-                .status(400)
-                .json({ msg: 'O usuário informado já existe!', Exists });
+            return res.json({
+                status: 400,
+                msg: 'O usuário informado já existe!',
+                Exists,
+            });
         }
         // Cria usuário
         const user = await User.create(req.body);
 
         user.password_hash = undefined;
 
-        return res
-            .json({ msg: 'Cadastro realizado com sucesso.', user });
+        return res.json(user);
     }
 
     async update(req, res) {
         // Validação
         const schema = Yup.object().shape({
             name: Yup.string(),
-            email: Yup.string()
-                .email(),
+            email: Yup.string().email(),
             login: Yup.string(),
             workshop_default: Yup.number(),
-            workshops: Yup.array().of(
-                Yup.number()
-            ),
+            workshops: Yup.array().of(Yup.number()),
             oldPassword: Yup.string(),
             password: Yup.string()
                 .min(6)
@@ -76,31 +93,35 @@ class UserController {
         });
         // Se campos não forem válidos gera erros
         if (!(await schema.isValid(req.body))) {
-            return res
-                .status(400)
-                .json({ msg: 'Erro de validação nos campos.' });
+            return res.json({
+                status: 400,
+                msg: 'Erro de validação nos campos.',
+            });
         }
         // Valores passados pelo body
         const { email, oldPassword } = req.body;
 
-        const { id } = req.params;
+        const id = req.params.id ? req.params.id : req.userId;
 
         // Verifica se usuário existe
         const Exists = await User.findByPk(id);
+        // Verificando mudança de email
         if (email !== Exists.email) {
             // Verificando se email existe
             const emailExists = await User.findOne({ where: { email } });
 
             if (emailExists) {
-                return res
-                    .status(400)
-                    .json({ msg: 'O usuário informado já existe!', Exists });
+                return res.json({
+                    status: 400,
+                    msg: 'O usuário informado já existe!',
+                    Exists,
+                });
             }
         }
         // Verificação de mudança de senha
         if (oldPassword && !(await Exists.checkPassword(oldPassword))) {
             // Se senha não bater
-            return res.status(401).json({ msg: 'Senha inválida.' });
+            return res.json({ status: 401, msg: 'Senha inválida.' });
         }
         // Atualização do usuário
         const user = await Exists.update(req.body);
@@ -108,7 +129,7 @@ class UserController {
         user.password = undefined;
         user.password_hash = undefined;
 
-        return res.json({ msg: 'Alteração realizada com sucesso', user });
+        return res.json(user);
     }
 }
 

@@ -51,8 +51,8 @@ class ServiceController {
                         include: {
                             model: Company,
                             as: 'company',
-                            attributes: ['id', 'description']
-                        }
+                            attributes: ['id', 'description'],
+                        },
                     },
                 },
                 {
@@ -84,12 +84,13 @@ class ServiceController {
             location_id: Yup.number(),
             workshop_id: Yup.number().required(),
         });
-        
+
         // Se campos não forem válidos gera erros
         if (!(await schema.isValid(req.body))) {
-            return res
-                .status(400)
-                .json({ msg: 'Erro de validação nos campos.' });
+            return res.json({
+                status: 400,
+                msg: 'Erro de validação nos campos.',
+            });
         }
         // Dados do serviço
         const {
@@ -116,7 +117,7 @@ class ServiceController {
             provider_id: provider ? req.userId : null,
         });
 
-        return res.json({ msg: 'Cadastro realizado com sucesso!', Service });
+        return res.json(Service);
     }
 
     async update(req, res) {
@@ -133,9 +134,10 @@ class ServiceController {
         });
         // Se campos não forem válidos gera erros
         if (!(await schema.isValid(req.body))) {
-            return res
-                .status(400)
-                .json({ msg: 'Erro de validação nos campos.' });
+            return res.json({
+                status: 400,
+                msg: 'Erro de validação nos campos.',
+            });
         }
         // Serviço a ser atualizado
         const { id } = req.params;
@@ -143,7 +145,10 @@ class ServiceController {
         const Exists = await Services.findByPk(id);
 
         if (!Exists) {
-            return res.json({ msg: 'Não existe registro a ser atualizado' });
+            return res.json({
+                status: 401,
+                msg: 'Não existe registro a ser atualizado',
+            });
         }
 
         // Criando informações no db
@@ -170,7 +175,7 @@ class ServiceController {
             provider_id,
         });
 
-        return res.json({ msg: 'Alteração realizada com sucesso', service });
+        return res.json(service);
     }
 }
 

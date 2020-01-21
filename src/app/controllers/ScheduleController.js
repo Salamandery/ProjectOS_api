@@ -28,9 +28,10 @@ class ScheduleController {
 
         // Erro caso não seja ou não exista
         if (!isUser) {
-            return res
-                .status(401)
-                .json({ msg: 'Usuário não é provedor de serviço.' });
+            return res.json({
+                status: 401,
+                msg: 'Usuário não é provedor de serviço.',
+            });
         }
         // Se provedor não for nulo
         const { provider } = req.params;
@@ -146,9 +147,10 @@ class ScheduleController {
 
         // Erro caso não seja ou não exista
         if (!isUser) {
-            return res
-                .status(401)
-                .json({ msg: 'Usuário não é provedor de serviço.' });
+            return res.json({
+                status: 401,
+                msg: 'Usuário não é provedor de serviço.',
+            });
         }
         // Se provedor não for nulo
         const { id, provider_id } = req.params;
@@ -157,12 +159,15 @@ class ScheduleController {
         const Exists = await Services.findByPk(id);
 
         if (!Exists) {
-            return res.json({ msg: 'Não existe registro a ser atualizado' });
+            return res.json({
+                status: 400,
+                msg: 'Não existe registro a ser atualizado',
+            });
         }
 
         if (provider_id) {
             if (provider_id == 0) {
-                return res.json({ msg: 'Provedor inválido.' });
+                return res.json({ status: 401, msg: 'Provedor inválido.' });
             }
             // Transferência de provedor de serviço
             const service = await Exists.update({
@@ -170,10 +175,7 @@ class ScheduleController {
                 user_id_lastupdate: req.userId,
             });
 
-            return res.json({
-                msg: 'Alteração realizada com sucesso',
-                service,
-            });
+            return res.json(service);
         }
 
         // Recebendo/Assumindo ordem de serviço
@@ -182,7 +184,7 @@ class ScheduleController {
             user_id_lastupdate: req.userId,
         });
 
-        return res.json({ msg: 'Alteração realizada com sucesso', service });
+        return res.json(service);
     }
 }
 

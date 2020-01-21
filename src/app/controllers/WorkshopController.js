@@ -22,9 +22,10 @@ class WorkshopController {
         });
         // Se campos não forem válidos gera erros
         if (!(await schema.isValid(req.body))) {
-            return res
-                .status(400)
-                .json({ msg: 'Erro de validação nos campos.' });
+            return res.json({
+                status: 400,
+                msg: 'Erro de validação nos campos.',
+            });
         }
         const { description, active } = req.body;
         // Codigo da empresa logada
@@ -36,9 +37,7 @@ class WorkshopController {
             company_id,
         });
 
-        return res
-            .status(200)
-            .json({ msg: 'Cadastro realizado com sucesso!', Workshop });
+        return res.json(Workshop);
     }
 
     async update(req, res) {
@@ -49,9 +48,10 @@ class WorkshopController {
         });
         // Se campos não forem válidos gera erros
         if (!(await schema.isValid(req.body))) {
-            return res
-                .status(400)
-                .json({ msg: 'Erro de validação nos campos.' });
+            return res.json({
+                status: 400,
+                msg: 'Erro de validação nos campos.',
+            });
         }
 
         const { id } = req.params;
@@ -61,15 +61,16 @@ class WorkshopController {
 
         if (!Exists) {
             // Oficina invalido
-            return res
-                .status(401)
-                .json({ msg: 'Oficina inválida ou não existe.' });
+            return res.json({
+                status: 401,
+                msg: 'Oficina inválida ou não existe.',
+            });
         }
 
         // Atualizando Oficina
         const Workshop = await Exists.update(req.body);
 
-        return res.json({ msg: 'Alteração realizada com sucesso!', Workshop });
+        return res.json(Workshop);
     }
 }
 

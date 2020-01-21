@@ -9,7 +9,7 @@ class CompanyController {
         const Company = await Companies.findAll({
             where: {
                 active: true,
-            }
+            },
         });
 
         return res.json(Company);
@@ -18,23 +18,20 @@ class CompanyController {
     async store(req, res) {
         // Validação
         const schema = Yup.object().shape({
-            description: Yup.string()
-                .required(),
-            identification: Yup.string()
-                .required(),
+            description: Yup.string().required(),
+            identification: Yup.string().required(),
         });
         // Se campos não forem válidos gera erros
         if (!(await schema.isValid(req.body))) {
-            return res
-                .status(400)
-                .json({ msg: 'Erro de validação nos campos.' });
+            return res.json({
+                status: 400,
+                msg: 'Erro de validação nos campos.',
+            });
         }
         // Realizar cadastro
         const Company = await Companies.create(req.body);
 
-        return res
-            .status(200)
-            .json({ msg: "Cadastro realizado com sucesso!", Company});
+        return res.json(Company);
     }
 
     async update(req, res) {
@@ -46,9 +43,10 @@ class CompanyController {
         });
         // Se campos não forem válidos gera erros
         if (!(await schema.isValid(req.body))) {
-            return res
-                .status(400)
-                .json({ msg: 'Erro de validação nos campos.' });
+            return res.json({
+                status: 400,
+                msg: 'Erro de validação nos campos.',
+            });
         }
 
         // Oficina a ser atualizado
@@ -56,14 +54,16 @@ class CompanyController {
 
         if (!Exists) {
             // Oficina invalido
-            return res.status(401).json({ msg: 'Oficina inválida ou não existe.' });
+            return res.json({
+                status: 401,
+                msg: 'Oficina inválida ou não existe.',
+            });
         }
 
-        // Atualizando Oficina 
+        // Atualizando Oficina
         const Company = await Exists.update(req.body);
 
-        return res
-            .json({ msg: "Alteração realizada com sucesso!", Company});
+        return res.json(Company);
     }
 }
 
