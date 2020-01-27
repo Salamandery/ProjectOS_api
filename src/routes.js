@@ -78,6 +78,8 @@ routes.get('/schedules/', ScheduleController.index);
 routes.get('/schedules/:provider', ScheduleController.index);
 // Listagem de Usuário e Serviço
 routes.get('/user_services', UserServiceController.index);
+// Informações do serviço e usuário
+routes.get('/user_service/:service_id', UserServiceController.show);
 // Listagem de Soluções
 routes.get('/solutions', SolutionController.index);
 // Listagem de Setores

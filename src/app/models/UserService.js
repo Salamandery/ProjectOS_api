@@ -7,7 +7,7 @@ class UserService extends Model {
                 note: Sequelize.STRING,
                 date_initial: Sequelize.DATE,
                 date_final: Sequelize.DATE,
-                min_to_resolve: Sequelize.INTEGER
+                min_to_resolve: Sequelize.INTEGER,
             },
             {
                 sequelize,
@@ -20,11 +20,17 @@ class UserService extends Model {
     // FK
     static associate(models) {
         // FK id do arquivo
-        this.belongsTo(models.Services, { foreignKey: 'service_id', as: 'service' });
+        this.belongsTo(models.Services, {
+            foreignKey: 'service_id',
+            as: 'service',
+        });
         // FK id do usuário
         this.belongsTo(models.User, { foreignKey: 'user_id', as: 'user' });
         // FK id do solução
-        this.belongsTo(models.Solutions, { foreignKey: 'solution_id', as: 'solution' });
+        this.belongsTo(models.Solutions, {
+            foreignKey: 'solution_id',
+            as: 'solution',
+        });
     }
 }
 

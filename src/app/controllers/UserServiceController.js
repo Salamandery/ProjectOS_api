@@ -1,7 +1,5 @@
-//import * as Yup from 'yup';
-import { startOfMonth } from 'date-fns';
-// Sequelize options
-import { Op } from 'sequelize';
+import * as Yup from 'yup';
+import moment from 'moment';
 // Modelo do usuário
 import User from '../models/Users';
 // Modelo de Serviço
@@ -16,9 +14,11 @@ import Sector from '../models/Sector';
 import Files from '../models/Files';
 // Modelo de oficina
 import Workshops from '../models/Workshop';
+// Modelo de Solução
+import Solutions from '../models/Solutions';
 
 class UserServiceController {
-    async index(req, res) {
+    async show(req, res) {
         // Se Usuário é provedor
         const isUser = await User.findOne({
             where: {
@@ -26,7 +26,6 @@ class UserServiceController {
                 provider: true,
             },
         });
-
         // Erro caso não seja ou não exista
         if (!isUser) {
             return res.json({
@@ -34,26 +33,13 @@ class UserServiceController {
                 msg: 'Usuário não é provedor de serviço.',
             });
         }
-
-        // data inicial do mês atual
-        const dateInitial = startOfMonth(new Date());
-        const Now = new Date();
-
+        // Parametros do serviço
+        const { service_id } = req.params;
         // Listando Serviços
         const Service = await UserServices.findAll({
             where: {
-                [Op.or]: [
-                    {
-                        user_id: {
-                            [Op.eq]: req.userId,
-                        },
-                    },
-                    {
-                        user_id: {
-                            [Op.ne]: req.userId,
-                        },
-                    },
-                ],
+                service_id,
+                user_id: req.userId,
             },
             attributes: [
                 'service_id',
@@ -75,24 +61,6 @@ class UserServiceController {
                         'description',
                         'note',
                     ],
-                    where: {
-                        [Op.or]: [
-                            {
-                                provider_id: {
-                                    [Op.eq]: req.userId,
-                                },
-                            },
-                            {
-                                provider_id: {
-                                    [Op.ne]: req.userId,
-                                },
-                            },
-                        ],
-                        date: {
-                            [Op.gte]: dateInitial,
-                            [Op.lte]: Now,
-                        },
-                    },
                     include: [
                         {
                             model: Locations,
@@ -102,9 +70,6 @@ class UserServiceController {
                                 model: Sector,
                                 as: 'sector',
                                 attributes: ['id', 'description'],
-                                where: {
-                                    company_id: req.comp,
-                                },
                             },
                         },
                         {
@@ -131,22 +96,23 @@ class UserServiceController {
                             model: Workshops,
                             as: 'workshop',
                             attributes: ['id', 'description'],
-                            where: {
-                                id: {
-                                    [Op.in]: isUser.workshops,
-                                },
-                                company_id: req.comp,
-                            },
                         },
                     ],
+                },
+                {
+                    model: Solutions,
+                    as: 'solution',
+                    attributes: ['id', 'description'],
+                    where: {
+                        active: true,
+                    },
                 },
             ],
         });
 
         return res.json(Service);
     }
-
-    async store(req, res) {
+    async index(req, res) {
         // Se Usuário é provedor
         const isUser = await User.findOne({
             where: {
@@ -154,7 +120,6 @@ class UserServiceController {
                 provider: true,
             },
         });
-
         // Erro caso não seja ou não exista
         if (!isUser) {
             return res.json({
@@ -162,11 +127,93 @@ class UserServiceController {
                 msg: 'Usuário não é provedor de serviço.',
             });
         }
+        // Listando Serviços
+        const Service = await UserServices.findAll({
+            where: {
+                user_id: req.userId,
+            },
+        });
 
-        return res.json();
+        return res.json(Service);
+    }
+
+    async store(req, res) {
+        // Validação
+        const schema = Yup.object().shape({
+            note: Yup.string(),
+            solution_id: Yup.number()
+                .moreThan(0)
+                .required(),
+            service_id: Yup.number().required(),
+            date_initial: Yup.date().required(),
+            date_final: Yup.date().required(),
+        });
+        // Se campos não forem válidos gera erros
+        if (!(await schema.isValid(req.body))) {
+            return res.json({
+                status: 400,
+                msg: 'Erro de validação nos campos.',
+            });
+        }
+        // Se Usuário é provedor
+        const isUser = await User.findOne({
+            where: {
+                id: req.userId,
+                provider: true,
+            },
+        });
+        // Erro caso não seja ou não exista
+        if (!isUser) {
+            return res.json({
+                status: 401,
+                msg: 'Usuário não é provedor de serviço.',
+            });
+        }
+        // Dados do serviço
+        const {
+            date_initial,
+            date_final,
+            note,
+            solution_id,
+            service_id,
+        } = req.body;
+        // Usuário que gerou o serviço
+        const user_id = req.userId;
+        // Minutos trabalhado
+        const min_to_resolve = moment(date_final).diff(
+            moment(date_initial),
+            'minutes'
+        );
+        // Criando informações no db
+        const UserService = await UserServices.create({
+            date_initial,
+            date_final,
+            note,
+            solution_id,
+            service_id,
+            user_id,
+            min_to_resolve,
+        });
+
+        return res.json(UserService);
     }
 
     async update(req, res) {
+        // Validação
+        const schema = Yup.object().shape({
+            note: Yup.string(),
+            solution_id: Yup.number().required(),
+            service_id: Yup.number().required(),
+            date_initial: Yup.date().required(),
+            date_final: Yup.date().required(),
+        });
+        // Se campos não forem válidos gera erros
+        if (!(await schema.isValid(req.body))) {
+            return res.json({
+                status: 400,
+                msg: 'Erro de validação nos campos.',
+            });
+        }
         // Se Usuário é provedor
         const isUser = await User.findOne({
             where: {
@@ -174,7 +221,6 @@ class UserServiceController {
                 provider: true,
             },
         });
-
         // Erro caso não seja ou não exista
         if (!isUser) {
             return res.json({
@@ -182,8 +228,39 @@ class UserServiceController {
                 msg: 'Usuário não é provedor de serviço.',
             });
         }
+        // Parametro do serviço
+        const { id } = req.params;
+        // Dados do serviço
+        const {
+            date_initial,
+            date_final,
+            note,
+            solution_id,
+            service_id,
+        } = req.body;
 
-        return res.json();
+        // Usuário que gerou o serviço
+        const user_id = req.userId;
+        // Buscando informações do serviço
+        const UserService = await UserServices.findByPk(id);
+        // Caso serviço não exista
+        if (!UserService) {
+            return res.json({
+                status: 401,
+                msg: 'Serviço não encontrado.',
+            });
+        }
+        // Atualizando informações do serviço
+        UserService.update({
+            date_initial,
+            date_final,
+            note,
+            solution_id,
+            service_id,
+            user_id,
+        });
+
+        return res.json(UserService);
     }
 
     async delete(req, res) {
@@ -194,12 +271,22 @@ class UserServiceController {
                 provider: true,
             },
         });
-
         // Erro caso não seja ou não exista
         if (!isUser) {
             return res.json({
                 status: 401,
                 msg: 'Usuário não é provedor de serviço.',
+            });
+        }
+        // Parametro do serviço
+        const { id } = req.params;
+        // Buscando informações do serviço
+        const UserService = await UserServices.findByPk(id);
+        // Caso serviço não exista
+        if (!UserService) {
+            return res.json({
+                status: 401,
+                msg: 'Serviço não encontrado.',
             });
         }
 

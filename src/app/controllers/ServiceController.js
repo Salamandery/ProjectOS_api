@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import moment from 'moment-timezone';
 import { startOfMonth } from 'date-fns';
 // Sequelize options
 import { Op } from 'sequelize';
@@ -77,7 +78,6 @@ class ServiceController {
     async store(req, res) {
         // Validação
         const schema = Yup.object().shape({
-            date: Yup.date().required(),
             title: Yup.string().required(),
             description: Yup.string().required(),
             note: Yup.string(),
@@ -94,7 +94,6 @@ class ServiceController {
         }
         // Dados do serviço
         const {
-            date,
             title,
             description,
             note,
@@ -105,6 +104,8 @@ class ServiceController {
 
         // Usuário que gerou o serviço
         const user_id = req.userId;
+        // Data atual
+        const date = moment().tz(process.env.TIMEZONE);
         // Criando informações no db
         const Service = await Services.create({
             date,

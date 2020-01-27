@@ -9,6 +9,7 @@ class SolutionController {
         const Solution = await Solutions.findAll({
             where: {
                 active: true,
+                workshop_id: req.wd
             },
         });
 
