@@ -1,5 +1,4 @@
 import * as Yup from 'yup';
-import moment from 'moment-timezone';
 import { startOfMonth } from 'date-fns';
 // Sequelize options
 import { Op } from 'sequelize';
@@ -71,7 +70,7 @@ class ServiceController {
                 },
             ],
         });
-
+        
         return res.json(Service);
     }
 
@@ -101,11 +100,10 @@ class ServiceController {
             workshop_id,
             provider,
         } = req.body;
-
         // Usuário que gerou o serviço
         const user_id = req.userId;
         // Data atual
-        const date = moment().tz(process.env.TIMEZONE);
+        const date = new Date();
         // Criando informações no db
         const Service = await Services.create({
             date,

@@ -1,7 +1,6 @@
-import { format, parseISO } from 'date-fns';
-import pt from 'date-fns/locale/pt-BR';
+import moment from 'moment-timezone';
 
 module.exports = function formatDate(date) {
-    //date = parseISO(date);
-    return format(date, 'dd/MM/yyyy HH:mm');
+    date = moment.tz(date, process.env.TZ).format("DD/MM/YYYY HH:mm");
+    return date;
 };

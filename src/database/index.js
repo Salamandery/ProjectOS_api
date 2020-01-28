@@ -24,10 +24,10 @@ import conf from '../config/database';
 
 // Lista de models
 const models = [
-    User, 
-    Files, 
-    Services, 
-    UserService, 
+    User,
+    Files,
+    Services,
+    UserService,
     Company,
     Sector,
     Locations,

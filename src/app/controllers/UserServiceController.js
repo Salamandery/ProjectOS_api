@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import moment from 'moment';
+import moment from 'moment-timezone';
 // Modelo do usuário
 import User from '../models/Users';
 // Modelo de Serviço
@@ -186,8 +186,8 @@ class UserServiceController {
         );
         // Criando informações no db
         const UserService = await UserServices.create({
-            date_initial,
-            date_final,
+            date_initial: moment.tz(date_initial, process.env.TZ).format(),
+            date_final: moment.tz(date_final, process.env.TZ).format(),
             note,
             solution_id,
             service_id,
